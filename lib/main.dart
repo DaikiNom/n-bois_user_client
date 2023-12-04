@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'バス時刻表',
       theme: ThemeData(
         // フォントを指定
-        textTheme: GoogleFonts.hinaMinchoTextTheme(
+        textTheme: GoogleFonts.kleeOneTextTheme(
           Theme.of(context).textTheme,
         ),
         primarySwatch: Colors.blue,
@@ -83,7 +83,7 @@ class _BusAppState extends State<BusApp> {
       // カウントダウンテキストを更新
       setState(() {
         _countdownText =
-            '${remainingTime.inHours}時間${remainingTime.inMinutes % 60}分${remainingTime.inSeconds % 60}秒';
+            '${remainingTime.inMinutes}分${(remainingTime.inSeconds % 60).toString().padLeft(2, '0')}秒';
       });
     });
   }
