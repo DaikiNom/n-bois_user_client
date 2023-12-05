@@ -1,7 +1,56 @@
+/* Author: N-BOIS Developer Team*/
+// NOTE: このファイルで実装された機能は，将来的に他のファイルに移行する
+// IDEA: マテリアルデザインではなく，ニューモーフィズムを採用する
+// IDEA: ライセンス検討の上，ニューモーフィズム用のパッケージを導入する
+// IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+/* 時刻表のList
+  id, destination, departureTime(TimeOfDay)
+  id: [1 → 柏行き, 2 → 柏行き(教職員優先), 3 → 西白井・白井・柏, 4 → 北総, -1 → 本日の運行は終了しました]
+  departureTime: 出発時刻
+*/
+// TODO: 曜日の情報の実装 → ID分ける？
+// NOTE: 時刻表は本番環境ではデータベース or API から取得するようにする
+
+List<BusSchedule> forKashiwa = [
+  BusSchedule(1, '柏', const TimeOfDay(hour: 11, minute: 10)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 11, minute: 50)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 12, minute: 10)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 12, minute: 50)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 13, minute: 30)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 13, minute: 50)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 14, minute: 20)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 15, minute: 10)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 15, minute: 40)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 10)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 40)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 55)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 17, minute: 10)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 30)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 45)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 00)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 18, minute: 20)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 45)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 00)),
+  BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 20)),
+];
+
+List<BusSchedule> forShinkamagaya = [
+  BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 18, minute: 30)),
+];
+
+List<BusSchedule> hokuso = [
+  BusSchedule(4, '北総', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(4, '北総', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(4, '北総', const TimeOfDay(hour: 18, minute: 30)),
+];
 
 void main() {
   runApp(const MyApp());
@@ -35,33 +84,21 @@ class BusApp extends StatefulWidget {
 }
 
 class _BusAppState extends State<BusApp> {
-  Text busDetail(BusSchedule busSchedule) {
+  String busDetail(BusSchedule busSchedule) {
     if (busSchedule.id == -1) {
-      // timerはいらない
-      dispose();
-      return const Text(
-        '本日の運行は終了しました',
-        style: TextStyle(fontSize: 30),
-        textAlign: TextAlign.center,
-      );
+      return '本日の運行は終了しました';
     } else if (busSchedule.id == 2) {
-      return const Text(
-        '柏行き(教職員優先)',
-        style: TextStyle(fontSize: 20),
-        textAlign: TextAlign.center,
-      );
+      return '次の 柏行き(教職員優先) のバスまで';
     } else {
-      return Text(
-        '次の ${busSchedule.destination}行き のバスまで',
-        style: const TextStyle(fontSize: 20),
-        textAlign: TextAlign.right,
-      );
+      return '次の ${busSchedule.destination}行き のバスまで';
     }
   }
 
   // カウントダウン用
   late StreamSubscription<dynamic> _subscription;
-  String _countdownText = '';
+  String _countdownTextForKashiwa = '',
+      _countdownTextForShinkamagaya = '',
+      _countdownTextForHokuso = '';
 
   @override
   void initState() {
@@ -72,18 +109,61 @@ class _BusAppState extends State<BusApp> {
       // 現在の時刻を取得
       final now = DateTime.now();
 
-      // 次のバスの発車時刻を取得
-      final nextBus = getFirstBus();
-
-      // 残り時間を計算
-      final remainingTime = DateTime(now.year, now.month, now.day,
-              nextBus.departureTime.hour, nextBus.departureTime.minute)
+      // 3つの時刻表についてそれぞれ一番はやく出発するバスを取得
+      final firstBusForKashiwa = getFirstBus(forKashiwa);
+      // 柏行きのバスが出発するまでの時間を取得
+      final timeForKashiwa = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              firstBusForKashiwa.departureTime.hour,
+              firstBusForKashiwa.departureTime.minute)
           .difference(now);
 
-      // カウントダウンテキストを更新
+      // TODO: 曜日での切り替えを実装
+      final firstBusForShinkamagaya = getFirstBus(forShinkamagaya);
+      // 新鎌ケ谷行きのバスが出発するまでの時間を取得
+      final timeForShinkamagaya = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              firstBusForShinkamagaya.departureTime.hour,
+              firstBusForShinkamagaya.departureTime.minute)
+          .difference(now);
+
+      final firstBusForHokuso = getFirstBus(hokuso);
+      // 北総行きのバスが出発するまでの時間を取得
+      final timeForHokuso = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              firstBusForHokuso.departureTime.hour,
+              firstBusForHokuso.departureTime.minute)
+          .difference(now);
+
+      // countdowntextを更新
       setState(() {
-        _countdownText =
-            '${remainingTime.inMinutes}分${(remainingTime.inSeconds % 60).toString().padLeft(2, '0')}秒';
+        // 最終便の時刻を過ぎていたら何も表示しない
+        if (firstBusForKashiwa.id == -1) {
+          _countdownTextForKashiwa = '🔚';
+        } else {
+          _countdownTextForKashiwa =
+              '${timeForKashiwa.inMinutes}分${(timeForKashiwa.inSeconds % 60).toString().padLeft(2, '0')}秒';
+        }
+
+        if (firstBusForShinkamagaya.id == -1) {
+          _countdownTextForShinkamagaya = '🔚';
+        } else {
+          _countdownTextForShinkamagaya =
+              '${timeForShinkamagaya.inMinutes}分${(timeForShinkamagaya.inSeconds % 60).toString().padLeft(2, '0')}秒';
+        }
+
+        if (firstBusForHokuso.id == -1) {
+          _countdownTextForHokuso = '🔚';
+        } else {
+          _countdownTextForHokuso =
+              '${timeForHokuso.inMinutes}分${(timeForHokuso.inSeconds % 60).toString().padLeft(2, '0')}秒';
+        }
       });
     });
   }
@@ -97,21 +177,74 @@ class _BusAppState extends State<BusApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('バス時刻表'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            busDetail(getFirstBus()),
-            Text(
-              _countdownText,
-              style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ],
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('バス時刻表'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: '柏行き'),
+              Tab(text: '新鎌ルート'),
+              Tab(text: '北総ルート'),
+            ],
+          ),
+        ),
+        body: ScreenUtilInit(
+          designSize: const Size(1080, 1920),
+          splitScreenMode: true,
+          // 画面サイズに応じて文字サイズを調整
+          builder: (context, screenUtil) {
+            return TabBarView(
+              children: [
+                // 柏行き
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      busDetail(getFirstBus(forKashiwa)),
+                      style: TextStyle(fontSize: 30.sp),
+                    ),
+                    Text(
+                      _countdownTextForKashiwa,
+                      style: TextStyle(
+                          fontSize: 75.sp, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                // 新鎌ルート
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      busDetail(getFirstBus(forShinkamagaya)),
+                      style: TextStyle(fontSize: 30.sp),
+                    ),
+                    Text(
+                      _countdownTextForShinkamagaya,
+                      style: TextStyle(
+                          fontSize: 75.sp, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                // 北総ルート
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      busDetail(getFirstBus(hokuso)),
+                      style: TextStyle(fontSize: 30.sp),
+                    ),
+                    Text(
+                      _countdownTextForHokuso,
+                      style: TextStyle(
+                          fontSize: 75.sp, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -127,32 +260,7 @@ class BusSchedule {
 }
 
 // 一番はやく出発するバスを取得する
-BusSchedule getFirstBus() {
-  List<BusSchedule> busSchedules = [
-    // 柏行きのみでテスト
-    // id [-1 → 本日の運行は終了しました, 1 → 柏行き, 2 → 柏行き(教職員優先)]
-    // id, destination, departureTime(TimeOfDay)
-    BusSchedule(1, '柏', const TimeOfDay(hour: 11, minute: 10)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 11, minute: 50)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 12, minute: 10)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 12, minute: 50)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 13, minute: 30)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 13, minute: 50)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 14, minute: 20)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 15, minute: 10)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 15, minute: 40)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 10)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 40)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 55)),
-    BusSchedule(2, '柏', const TimeOfDay(hour: 17, minute: 10)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 30)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 45)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 00)),
-    BusSchedule(2, '柏', const TimeOfDay(hour: 18, minute: 20)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 45)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 00)),
-    BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 20)),
-  ];
+BusSchedule getFirstBus(List<BusSchedule> busSchedules) {
   // 今の時刻を取得
   final now = DateTime.now();
   // 一番はやく出発するバスを取得
