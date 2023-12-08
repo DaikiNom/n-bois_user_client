@@ -11,10 +11,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /* 時刻表のList
   id, destination, departureTime(TimeOfDay)
-  id: [1 → 柏行き, 2 → 柏行き(教職員優先), 3 → 西白井・白井・柏, 4 → 北総, -1 → 本日の運行は終了しました]
+  id: [1 → 常時運行, 2 → 常時運行(平日のみ教職員優先), 3 → 平日のみ運行, 4 → 休日のみ運行,-1 → 本日の運行は終了しました]
   departureTime: 出発時刻
 */
-// TODO: 曜日の情報の実装 → ID分ける？
 // NOTE: 時刻表は本番環境ではデータベース or API から取得するようにする
 
 List<BusSchedule> forKashiwa = [
@@ -41,15 +40,15 @@ List<BusSchedule> forKashiwa = [
 ];
 
 List<BusSchedule> forShinkamagaya = [
-  BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(4, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 13, minute: 15)),
   BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 16, minute: 00)),
-  BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 18, minute: 30)),
+  BusSchedule(1, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 18, minute: 30)),
 ];
 
 List<BusSchedule> hokuso = [
   BusSchedule(4, '北総', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(4, '北総', const TimeOfDay(hour: 16, minute: 00)),
-  BusSchedule(4, '北総', const TimeOfDay(hour: 18, minute: 30)),
+  BusSchedule(3, '北総', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(1, '北総', const TimeOfDay(hour: 18, minute: 30)),
 ];
 
 void main() {
@@ -88,7 +87,7 @@ class _BusAppState extends State<BusApp> {
     if (busSchedule.id == -1) {
       return '本日の運行は終了しました';
     } else if (busSchedule.id == 2) {
-      return '次の 柏行き(教職員優先) のバスまで';
+      return '次の ${busSchedule.destination}(教職員優先) のバスまで';
     } else {
       return '次の ${busSchedule.destination}行き のバスまで';
     }
@@ -120,7 +119,6 @@ class _BusAppState extends State<BusApp> {
               firstBusForKashiwa.departureTime.minute)
           .difference(now);
 
-      // TODO: 曜日での切り替えを実装
       final firstBusForShinkamagaya = getFirstBus(forShinkamagaya);
       // 新鎌ケ谷行きのバスが出発するまでの時間を取得
       final timeForShinkamagaya = DateTime(
@@ -264,13 +262,37 @@ BusSchedule getFirstBus(List<BusSchedule> busSchedules) {
   // 今の時刻を取得
   final now = DateTime.now();
   // 一番はやく出発するバスを取得
-  final firstBus = busSchedules.firstWhereOrNull((busSchedule) => DateTime(
-          now.year,
-          now.month,
-          now.day,
-          busSchedule.departureTime.hour,
-          busSchedule.departureTime.minute)
-      .isAfter(now));
+  final firstBus;
+
+  if (now.weekday == DateTime.saturday) {
+    // 土曜日の場合
+    firstBus = busSchedules
+        .where((busSchedule) =>
+            busSchedule.id == 4 || busSchedule.id == 1 || busSchedule.id == 2)
+        .firstWhereOrNull((busSchedule) => DateTime(
+                now.year,
+                now.month,
+                now.day,
+                busSchedule.departureTime.hour,
+                busSchedule.departureTime.minute)
+            .isAfter(now));
+  } else if (now.weekday == DateTime.sunday) {
+    // 日曜日の場合
+    // nullを返す
+    firstBus = null;
+  } else {
+    // 平日の場合
+    firstBus = busSchedules
+        .where((busSchedule) =>
+            busSchedule.id == 3 || busSchedule.id == 1 || busSchedule.id == 2)
+        .firstWhereOrNull((busSchedule) => DateTime(
+                now.year,
+                now.month,
+                now.day,
+                busSchedule.departureTime.hour,
+                busSchedule.departureTime.minute)
+            .isAfter(now));
+  }
 
   // 存在しない場合の処理
   if (firstBus == null) {
