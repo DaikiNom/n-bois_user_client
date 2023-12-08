@@ -5,7 +5,6 @@
 // IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -187,6 +186,7 @@ class _BusAppState extends State<BusApp> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -213,12 +213,14 @@ class _BusAppState extends State<BusApp> {
                   children: [
                     Text(
                       busDetail(getFirstBus(forKashiwa)),
-                      style: TextStyle(fontSize: 30.sp),
+                      style: TextStyle(
+                          fontSize: screenWidth > 830 ? 30.sp : 50.sp),
                     ),
                     Text(
                       _countdownTextForKashiwa,
                       style: TextStyle(
-                          fontSize: 75.sp, fontWeight: FontWeight.w500),
+                          fontSize: screenWidth > 830 ? 70.sp : 100.sp,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -228,12 +230,14 @@ class _BusAppState extends State<BusApp> {
                   children: [
                     Text(
                       busDetail(getFirstBus(forShinkamagaya)),
-                      style: TextStyle(fontSize: 30.sp),
+                      style: TextStyle(
+                          fontSize: screenWidth > 830 ? 30.sp : 50.sp),
                     ),
                     Text(
                       _countdownTextForShinkamagaya,
                       style: TextStyle(
-                          fontSize: 75.sp, fontWeight: FontWeight.w500),
+                          fontSize: screenWidth > 830 ? 70.sp : 100.sp,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -243,12 +247,14 @@ class _BusAppState extends State<BusApp> {
                   children: [
                     Text(
                       busDetail(getFirstBus(hokuso)),
-                      style: TextStyle(fontSize: 30.sp),
+                      style: TextStyle(
+                          fontSize: screenWidth > 830 ? 30.sp : 50.sp),
                     ),
                     Text(
                       _countdownTextForHokuso,
                       style: TextStyle(
-                          fontSize: 75.sp, fontWeight: FontWeight.w500),
+                          fontSize: screenWidth > 830 ? 70.sp : 100.sp,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -276,7 +282,10 @@ BusSchedule getFirstBus(List<BusSchedule> busSchedules) {
   // 一番はやく出発するバスを取得
   final firstBus;
 
-  if (now.weekday == DateTime.saturday) {
+  if (now.weekday == DateTime.sunday || now.hour <= 5) {
+    // 日曜日 or まだ5時前の場合
+    firstBus = null;
+  } else if (now.weekday == DateTime.saturday) {
     // 土曜日の場合
     firstBus = busSchedules
         .where((busSchedule) =>
@@ -288,10 +297,6 @@ BusSchedule getFirstBus(List<BusSchedule> busSchedules) {
                 busSchedule.departureTime.hour,
                 busSchedule.departureTime.minute)
             .isAfter(now));
-  } else if (now.weekday == DateTime.sunday) {
-    // 日曜日の場合
-    // nullを返す
-    firstBus = null;
   } else {
     // 平日の場合
     firstBus = busSchedules
@@ -306,7 +311,7 @@ BusSchedule getFirstBus(List<BusSchedule> busSchedules) {
             .isAfter(now));
   }
 
-  // 存在しない場合の処理
+  // firstBusに何も格納されていない場合の処理
   if (firstBus == null) {
     return BusSchedule(-1, '本日の運行は終了しました', const TimeOfDay(hour: 0, minute: 0));
   } else {
