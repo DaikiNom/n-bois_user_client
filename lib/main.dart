@@ -5,6 +5,7 @@
 // IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -63,12 +64,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'バス時刻表',
       theme: ThemeData(
-        // フォントを指定
+        brightness: Brightness.light,
+        useMaterial3: true,
         textTheme: GoogleFonts.kleeOneTextTheme(
           Theme.of(context).textTheme,
         ),
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.blueGrey,
       ),
+      // dark modeを有効化
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        useMaterial3: true,
+        textTheme: GoogleFonts.kleeOneTextTheme(
+          Theme.of(context).textTheme.apply(bodyColor: Colors.white),
+        ),
+        primaryColor: Colors.blueGrey,
+      ),
+      themeMode: ThemeMode.system,
       // ホーム画面を指定
       home: const BusApp(),
     );
