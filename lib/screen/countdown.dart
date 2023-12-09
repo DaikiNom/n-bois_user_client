@@ -4,8 +4,8 @@ import 'dart:async';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /* 時刻表のList
-  id, destination, departureTime(TimeOfDay)
-  id: [1 → 常時運行, 2 → 常時運行(平日のみ教職員優先), 3 → 平日のみ運行, 4 → 休日のみ運行,-1 → 本日の運行は終了しました]
+  id, station, departureTime(TimeOfDay)
+  id: [1 → 常時運行(校舎発), 2 → 常時運行(校舎行), 3 → 常時運行(平日のみ教職員優先), 4 → 平日のみ運行, 5 → 休日のみ運行, -1 → 本日の運行は終了しました]
   departureTime: 出発時刻
 */
 // NOTE: 時刻表は本番環境ではデータベース or API から取得するようにする
@@ -23,26 +23,53 @@ List<BusSchedule> forKashiwa = [
   BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 10)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 40)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 55)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 17, minute: 10)),
+  BusSchedule(3, '柏', const TimeOfDay(hour: 17, minute: 10)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 30)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 45)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 00)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 18, minute: 20)),
+  BusSchedule(3, '柏', const TimeOfDay(hour: 18, minute: 20)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 45)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 00)),
   BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 20)),
 ];
 
 List<BusSchedule> forShinkamagaya = [
-  BusSchedule(4, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(3, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(5, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(4, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 16, minute: 00)),
   BusSchedule(1, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 18, minute: 30)),
 ];
 
 List<BusSchedule> forHokuso = [
-  BusSchedule(4, '北総', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(3, '北総', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(5, '北総', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(4, '北総', const TimeOfDay(hour: 16, minute: 00)),
   BusSchedule(1, '北総', const TimeOfDay(hour: 18, minute: 30)),
+];
+
+List<BusSchedule> fromKashiwa = [
+  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 10)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 15)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 20)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 25)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 35)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 40)),
+  BusSchedule(2, '柏(二松駐車場)', const TimeOfDay(hour: 7, minute: 45)),
+  BusSchedule(2, '柏(二松駐車場)', const TimeOfDay(hour: 8, minute: 05)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 8, minute: 27)),
+  BusSchedule(2, '柏(二松駐車場)', const TimeOfDay(hour: 8, minute: 50)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 9, minute: 00)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 9, minute: 30)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 10, minute: 00)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 10, minute: 30)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 11, minute: 05)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 11, minute: 20)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 12, minute: 05)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 12, minute: 25)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 13, minute: 05)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 13, minute: 45)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 14, minute: 05)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 14, minute: 35)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 15, minute: 25)),
+  BusSchedule(2, '柏', const TimeOfDay(hour: 15, minute: 55)),
 ];
 
 class BusCountdown extends StatefulWidget {
@@ -53,13 +80,21 @@ class BusCountdown extends StatefulWidget {
 }
 
 class _BusCountdownState extends State<BusCountdown> {
-  String busDetail(BusSchedule busSchedule) {
+  String busDetailFromSchool(BusSchedule busSchedule) {
     if (busSchedule.id == -1) {
       return '本日の運行は終了しました';
     } else if (busSchedule.id == 2) {
-      return '次の ${busSchedule.destination}(教職員優先) のバスまで';
+      return '次の ${busSchedule.station}(教職員優先) のバスまで';
     } else {
-      return '次の ${busSchedule.destination}行き のバスまで';
+      return '次の ${busSchedule.station}行き のバスまで';
+    }
+  }
+
+  String busDetailToSchool(BusSchedule busSchedule) {
+    if (busSchedule.id == -1) {
+      return '本日の運行は終了しました';
+    } else {
+      return '次の ${busSchedule.station}行き のバスまで';
     }
   }
 
@@ -67,7 +102,8 @@ class _BusCountdownState extends State<BusCountdown> {
   late StreamSubscription<dynamic> _subscription;
   String _countdownTextForKashiwa = '',
       _countdownTextForShinkamagaya = '',
-      _countdownTextForforHokuso = '';
+      _countdownTextForHokuso = '',
+      _countdownTextFromKashiwa = '';
 
   @override
   void initState() {
@@ -99,14 +135,24 @@ class _BusCountdownState extends State<BusCountdown> {
               firstBusForShinkamagaya.departureTime.minute)
           .difference(now);
 
-      final firstBusForforHokuso = getFirstBus(forHokuso);
+      final firstBusForHokuso = getFirstBus(forHokuso);
       // 北総行きのバスが出発するまでの時間を取得
-      final timeForforHokuso = DateTime(
+      final timeForHokuso = DateTime(
               now.year,
               now.month,
               now.day,
-              firstBusForforHokuso.departureTime.hour,
-              firstBusForforHokuso.departureTime.minute)
+              firstBusForHokuso.departureTime.hour,
+              firstBusForHokuso.departureTime.minute)
+          .difference(now);
+
+      final firstBusFromKashiwa = getFirstBus(fromKashiwa);
+      // 柏発のバスが出発するまでの時間を取得
+      final timeFromKashiwa = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              firstBusFromKashiwa.departureTime.hour,
+              firstBusFromKashiwa.departureTime.minute)
           .difference(now);
 
       // countdowntextを更新
@@ -126,11 +172,18 @@ class _BusCountdownState extends State<BusCountdown> {
               '${timeForShinkamagaya.inMinutes}分${(timeForShinkamagaya.inSeconds % 60).toString().padLeft(2, '0')}秒';
         }
 
-        if (firstBusForforHokuso.id == -1) {
-          _countdownTextForforHokuso = '🔚';
+        if (firstBusForHokuso.id == -1) {
+          _countdownTextForHokuso = '🔚';
         } else {
-          _countdownTextForforHokuso =
-              '${timeForforHokuso.inMinutes}分${(timeForforHokuso.inSeconds % 60).toString().padLeft(2, '0')}秒';
+          _countdownTextForHokuso =
+              '${timeForHokuso.inMinutes}分${(timeForHokuso.inSeconds % 60).toString().padLeft(2, '0')}秒';
+        }
+
+        if (firstBusFromKashiwa.id == -1) {
+          _countdownTextFromKashiwa = '🔚';
+        } else {
+          _countdownTextFromKashiwa =
+              '${timeFromKashiwa.inMinutes}分${(timeFromKashiwa.inSeconds % 60).toString().padLeft(2, '0')}秒';
         }
       });
     });
@@ -147,7 +200,7 @@ class _BusCountdownState extends State<BusCountdown> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('バス時刻表'),
@@ -176,7 +229,7 @@ class _BusCountdownState extends State<BusCountdown> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            busDetail(getFirstBus(forKashiwa)),
+                            busDetailFromSchool(getFirstBus(forKashiwa)),
                             style: TextStyle(
                                 fontSize: screenWidth > 830 ? 25.sp : 45.sp),
                           ),
@@ -197,7 +250,7 @@ class _BusCountdownState extends State<BusCountdown> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            busDetail(getFirstBus(forShinkamagaya)),
+                            busDetailFromSchool(getFirstBus(forShinkamagaya)),
                             style: TextStyle(
                                 fontSize: screenWidth > 830 ? 25.sp : 45.sp),
                           ),
@@ -218,12 +271,12 @@ class _BusCountdownState extends State<BusCountdown> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            busDetail(getFirstBus(forHokuso)),
+                            busDetailFromSchool(getFirstBus(forHokuso)),
                             style: TextStyle(
                                 fontSize: screenWidth > 830 ? 25.sp : 45.sp),
                           ),
                           Text(
-                            _countdownTextForforHokuso,
+                            _countdownTextForHokuso,
                             style: TextStyle(
                                 fontSize: screenWidth > 830 ? 50.sp : 90.sp,
                                 fontWeight: FontWeight.w500),
@@ -233,13 +286,26 @@ class _BusCountdownState extends State<BusCountdown> {
                 ),
                 // 校舎行き
                 Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        busDetail(getFirstBus(forKashiwa)),
-                        style: TextStyle(
-                            fontSize: screenWidth > 830 ? 30.sp : 50.sp),
-                      ),
+                      // 柏発
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              busDetailToSchool(getFirstBus(fromKashiwa)),
+                              style: TextStyle(
+                                  fontSize: screenWidth > 830 ? 25.sp : 45.sp),
+                            ),
+                            Text(
+                              _countdownTextFromKashiwa,
+                              style: TextStyle(
+                                  fontSize: screenWidth > 830 ? 50.sp : 90.sp,
+                                  fontWeight: FontWeight.w500),
+                            )
+                          ]),
                     ])
               ],
             );
@@ -252,10 +318,10 @@ class _BusCountdownState extends State<BusCountdown> {
 
 class BusSchedule {
   final int id;
-  final String destination;
+  final String station;
   final TimeOfDay departureTime;
 
-  BusSchedule(this.id, this.destination, this.departureTime);
+  BusSchedule(this.id, this.station, this.departureTime);
 }
 
 // 一番はやく出発するバスを取得する
