@@ -110,11 +110,56 @@ class _NotificationScreenState extends State<NotificationScreen> {
           return Card(
             child: ListTile(
               title: Text(allNotifications[index].title),
-              subtitle: Text(allNotifications[index].body),
+              subtitle: allNotifications[index].body.length > 30
+                  ? Text(allNotifications[index].body.replaceRange(
+                      30, allNotifications[index].body.length, '...'))
+                  : Text(allNotifications[index].body),
               trailing: Text(format.format(allNotifications[index].date)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NotificationDetailScreen(
+                      notification: allNotifications[index],
+                    ),
+                  ),
+                );
+              },
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// 通知詳細画面
+class NotificationDetailScreen extends StatelessWidget {
+  final busNotification notification;
+  const NotificationDetailScreen({Key? key, required this.notification})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('通知詳細'),
+      ),
+      body: Column(
+        children: [
+          ListTile(
+            title: Text(notification.title),
+            subtitle: Text(notification.body),
+          ),
+          ListTile(
+            title: Text('送信者'),
+            subtitle: Text(notification.sender),
+          ),
+          ListTile(
+            title: Text('送信日時'),
+            subtitle: Text(DateFormat('yyyy/MM/dd').format(notification.date)),
+          ),
+        ],
       ),
     );
   }
