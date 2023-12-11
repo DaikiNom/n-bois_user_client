@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'バス時刻表',
+      title: 'N-BOIS',
       theme: ThemeData(
         brightness: Brightness.light,
         useMaterial3: true,
