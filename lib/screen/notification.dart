@@ -152,11 +152,11 @@ class NotificationDetailScreen extends StatelessWidget {
             subtitle: Text(notification.body),
           ),
           ListTile(
-            title: Text('送信者'),
+            title: const Text('送信者'),
             subtitle: Text(notification.sender),
           ),
           ListTile(
-            title: Text('送信日時'),
+            title: const Text('送信日時'),
             subtitle: Text(DateFormat('yyyy/MM/dd').format(notification.date)),
           ),
         ],
