@@ -174,7 +174,7 @@ class _BusCountdownState extends State<BusCountdown> {
 
       // 一番はやく出発するバスを取得
       for (int i = 0; i < busSchedules.length; i++) {
-        if (busSchedules[i].id == -1) {
+        if (busSchedules[i].id != -1) {
           times[i] = DateTime(
                   now.year,
                   now.month,
@@ -187,33 +187,33 @@ class _BusCountdownState extends State<BusCountdown> {
       // countdowntextを更新
       setState(() {
         // 最終便の時刻を過ぎていたら何も表示しない
-        _countdownTextForKashiwa = times[0].isNegative
+        _countdownTextForKashiwa = times[0] == const Duration()
             ? '🔚'
-            : '${times[0].inMinutes.remainder(60)}分${times[0].inSeconds.remainder(60)}秒';
-        _countdownTextForShinkamagaya = times[1].isNegative
+            : '${times[0].inMinutes}分${times[0].inSeconds % 60}秒';
+        _countdownTextForShinkamagaya = times[1] == const Duration()
             ? '🔚'
-            : '${times[1].inMinutes.remainder(60)}分${times[1].inSeconds.remainder(60)}秒';
-        _countdownTextForHokuso = times[2].isNegative
+            : '${times[1].inMinutes}分${times[1].inSeconds % 60}秒';
+        _countdownTextForHokuso = times[2] == const Duration()
             ? '🔚'
-            : '${times[2].inMinutes.remainder(60)}分${times[2].inSeconds.remainder(60)}秒';
-        _countdownTextFromKashiwa = times[3].isNegative
+            : '${times[2].inMinutes}分${times[2].inSeconds % 60}秒';
+        _countdownTextFromKashiwa = times[3] == const Duration()
             ? '🔚'
-            : '${times[3].inMinutes.remainder(60)}分${times[3].inSeconds.remainder(60)}秒';
-        _countdownTextFromShinkamagaya = times[4].isNegative
+            : '${times[3].inMinutes}分${times[3].inSeconds % 60}秒';
+        _countdownTextFromShinkamagaya = times[4] == const Duration()
             ? '🔚'
-            : '${times[4].inMinutes.remainder(60)}分${times[4].inSeconds.remainder(60)}秒';
-        _countdownTextFromShiroi = times[5].isNegative
+            : '${times[4].inMinutes}分${times[4].inSeconds % 60}秒';
+        _countdownTextFromShiroi = times[5] == const Duration()
             ? '🔚'
-            : '${times[5].inMinutes.remainder(60)}分${times[5].inSeconds.remainder(60)}秒';
-        _countdownTextFromHokuso = times[6].isNegative
+            : '${times[5].inMinutes}分${times[5].inSeconds % 60}秒';
+        _countdownTextFromHokuso = times[6] == const Duration()
             ? '🔚'
-            : '${times[6].inMinutes.remainder(60)}分${times[6].inSeconds.remainder(60)}秒';
-        _countdownTextFromShinKashiwa = times[7].isNegative
+            : '${times[6].inMinutes}分${times[6].inSeconds % 60}秒';
+        _countdownTextFromShinKashiwa = times[7] == const Duration()
             ? '🔚'
-            : '${times[7].inMinutes.remainder(60)}分${times[7].inSeconds.remainder(60)}秒';
-        _countdownTextFromAbiko = times[8].isNegative
+            : '${times[7].inMinutes}分${times[7].inSeconds % 60}秒';
+        _countdownTextFromAbiko = times[8] == const Duration()
             ? '🔚'
-            : '${times[8].inMinutes.remainder(60)}分${times[8].inSeconds.remainder(60)}秒';
+            : '${times[8].inMinutes}分${times[8].inSeconds % 60}秒';
       });
     });
   }
