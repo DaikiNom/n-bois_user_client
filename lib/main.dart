@@ -4,12 +4,17 @@
 // IDEA: ライセンス検討の上，ニューモーフィズム用のパッケージを導入する
 // IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nbois_user_client/screen/countdown.dart';
 import 'package:nbois_user_client/screen/map.dart';
 import 'package:nbois_user_client/screen/notification.dart';
 
 void main() {
+  // 縦向き固定
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 
