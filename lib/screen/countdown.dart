@@ -34,15 +34,15 @@ List<BusSchedule> forKashiwa = [
 ];
 
 List<BusSchedule> forShinkamagaya = [
-  BusSchedule(5, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(4, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 16, minute: 00)),
-  BusSchedule(1, '西白井・白井・新鎌ケ谷', const TimeOfDay(hour: 18, minute: 30)),
+  BusSchedule(5, '新鎌ケ谷方面', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(4, '新鎌ケ谷方面', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(1, '新鎌ケ谷方面', const TimeOfDay(hour: 18, minute: 30)),
 ];
 
 List<BusSchedule> forHokuso = [
-  BusSchedule(5, '北総', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(4, '北総', const TimeOfDay(hour: 16, minute: 00)),
-  BusSchedule(1, '北総', const TimeOfDay(hour: 18, minute: 30)),
+  BusSchedule(5, '北総方面', const TimeOfDay(hour: 13, minute: 15)),
+  BusSchedule(4, '北総方面', const TimeOfDay(hour: 16, minute: 00)),
+  BusSchedule(1, '北総方面', const TimeOfDay(hour: 18, minute: 30)),
 ];
 
 List<BusSchedule> fromKashiwa = [
@@ -72,6 +72,32 @@ List<BusSchedule> fromKashiwa = [
   BusSchedule(2, '柏', const TimeOfDay(hour: 15, minute: 55)),
 ];
 
+List<BusSchedule> fromShinkamagaya = [
+  BusSchedule(2, '新鎌ケ谷', const TimeOfDay(hour: 7, minute: 10)),
+];
+
+List<BusSchedule> fromShiroi = [
+  BusSchedule(2, '白井', const TimeOfDay(hour: 7, minute: 15)),
+  BusSchedule(2, '西白井', const TimeOfDay(hour: 7, minute: 25)),
+];
+
+List<BusSchedule> fromHokuso = [
+  BusSchedule(2, '印旛日本医大', const TimeOfDay(hour: 7, minute: 10)),
+  BusSchedule(2, '千葉ニュータウン', const TimeOfDay(hour: 7, minute: 15)),
+  BusSchedule(2, '印西牧の原', const TimeOfDay(hour: 7, minute: 20)),
+  BusSchedule(2, '小室', const TimeOfDay(hour: 7, minute: 30)),
+];
+
+List<BusSchedule> fromShinKashiwa = [
+  BusSchedule(2, '新柏', const TimeOfDay(hour: 7, minute: 20)),
+  BusSchedule(2, '新柏', const TimeOfDay(hour: 8, minute: 10)),
+];
+
+List<BusSchedule> fromAbiko = [
+  BusSchedule(2, '我孫子', const TimeOfDay(hour: 7, minute: 20)),
+  BusSchedule(2, '我孫子', const TimeOfDay(hour: 8, minute: 12)),
+];
+
 class BusCountdown extends StatefulWidget {
   const BusCountdown({Key? key}) : super(key: key);
 
@@ -94,7 +120,7 @@ class _BusCountdownState extends State<BusCountdown> {
     if (busSchedule.id == -1) {
       return '本日の運行は終了しました';
     } else {
-      return '次の ${busSchedule.station}行き のバスまで';
+      return '次の ${busSchedule.station}発 のバスまで';
     }
   }
 
@@ -103,7 +129,12 @@ class _BusCountdownState extends State<BusCountdown> {
   String _countdownTextForKashiwa = '',
       _countdownTextForShinkamagaya = '',
       _countdownTextForHokuso = '',
-      _countdownTextFromKashiwa = '';
+      _countdownTextFromKashiwa = '',
+      _countdownTextFromShinkamagaya = '',
+      _countdownTextFromShiroi = '',
+      _countdownTextFromHokuso = '',
+      _countdownTextFromShinKashiwa = '',
+      _countdownTextFromAbiko = '';
 
   @override
   void initState() {
@@ -116,75 +147,73 @@ class _BusCountdownState extends State<BusCountdown> {
 
       // 3つの時刻表についてそれぞれ一番はやく出発するバスを取得
       final firstBusForKashiwa = getFirstBus(forKashiwa);
-      // 柏行きのバスが出発するまでの時間を取得
-      final timeForKashiwa = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              firstBusForKashiwa.departureTime.hour,
-              firstBusForKashiwa.departureTime.minute)
-          .difference(now);
-
       final firstBusForShinkamagaya = getFirstBus(forShinkamagaya);
-      // 新鎌ケ谷行きのバスが出発するまでの時間を取得
-      final timeForShinkamagaya = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              firstBusForShinkamagaya.departureTime.hour,
-              firstBusForShinkamagaya.departureTime.minute)
-          .difference(now);
-
       final firstBusForHokuso = getFirstBus(forHokuso);
-      // 北総行きのバスが出発するまでの時間を取得
-      final timeForHokuso = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              firstBusForHokuso.departureTime.hour,
-              firstBusForHokuso.departureTime.minute)
-          .difference(now);
-
       final firstBusFromKashiwa = getFirstBus(fromKashiwa);
-      // 柏発のバスが出発するまでの時間を取得
-      final timeFromKashiwa = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              firstBusFromKashiwa.departureTime.hour,
-              firstBusFromKashiwa.departureTime.minute)
-          .difference(now);
+      final firstBusFromShinkamagaya = getFirstBus(fromShinkamagaya);
+      final firstBusFromShiroi = getFirstBus(fromShiroi);
+      final firstBusFromHokuso = getFirstBus(fromHokuso);
+      final firstBusFromShinKashiwa = getFirstBus(fromShinKashiwa);
+      final firstBusFromAbiko = getFirstBus(fromAbiko);
 
+      // 上記処理を，forと配列を用いてまとめる
+      final List<BusSchedule> busSchedules = [
+        firstBusForKashiwa,
+        firstBusForShinkamagaya,
+        firstBusForHokuso,
+        firstBusFromKashiwa,
+        firstBusFromShinkamagaya,
+        firstBusFromShiroi,
+        firstBusFromHokuso,
+        firstBusFromShinKashiwa,
+        firstBusFromAbiko
+      ];
+
+      final List<Duration> times =
+          List.filled(busSchedules.length, const Duration());
+
+      // 一番はやく出発するバスを取得
+      for (int i = 0; i < busSchedules.length; i++) {
+        if (busSchedules[i].id == -1) {
+          times[i] = DateTime(
+                  now.year,
+                  now.month,
+                  now.day,
+                  busSchedules[i].departureTime.hour,
+                  busSchedules[i].departureTime.minute)
+              .difference(now);
+        }
+      }
       // countdowntextを更新
       setState(() {
         // 最終便の時刻を過ぎていたら何も表示しない
-        if (firstBusForKashiwa.id == -1) {
-          _countdownTextForKashiwa = '🔚';
-        } else {
-          _countdownTextForKashiwa =
-              '${timeForKashiwa.inMinutes}分${(timeForKashiwa.inSeconds % 60).toString().padLeft(2, '0')}秒';
-        }
-
-        if (firstBusForShinkamagaya.id == -1) {
-          _countdownTextForShinkamagaya = '🔚';
-        } else {
-          _countdownTextForShinkamagaya =
-              '${timeForShinkamagaya.inMinutes}分${(timeForShinkamagaya.inSeconds % 60).toString().padLeft(2, '0')}秒';
-        }
-
-        if (firstBusForHokuso.id == -1) {
-          _countdownTextForHokuso = '🔚';
-        } else {
-          _countdownTextForHokuso =
-              '${timeForHokuso.inMinutes}分${(timeForHokuso.inSeconds % 60).toString().padLeft(2, '0')}秒';
-        }
-
-        if (firstBusFromKashiwa.id == -1) {
-          _countdownTextFromKashiwa = '🔚';
-        } else {
-          _countdownTextFromKashiwa =
-              '${timeFromKashiwa.inMinutes}分${(timeFromKashiwa.inSeconds % 60).toString().padLeft(2, '0')}秒';
-        }
+        _countdownTextForKashiwa = times[0].isNegative
+            ? '🔚'
+            : '${times[0].inMinutes.remainder(60)}分${times[0].inSeconds.remainder(60)}秒';
+        _countdownTextForShinkamagaya = times[1].isNegative
+            ? '🔚'
+            : '${times[1].inMinutes.remainder(60)}分${times[1].inSeconds.remainder(60)}秒';
+        _countdownTextForHokuso = times[2].isNegative
+            ? '🔚'
+            : '${times[2].inMinutes.remainder(60)}分${times[2].inSeconds.remainder(60)}秒';
+        _countdownTextFromKashiwa = times[3].isNegative
+            ? '🔚'
+            : '${times[3].inMinutes.remainder(60)}分${times[3].inSeconds.remainder(60)}秒';
+        _countdownTextFromShinkamagaya = times[4].isNegative
+            ? '🔚'
+            : '${times[4].inMinutes.remainder(60)}分${times[4].inSeconds.remainder(60)}秒';
+        _countdownTextFromShiroi = times[5].isNegative
+            ? '🔚'
+            : '${times[5].inMinutes.remainder(60)}分${times[5].inSeconds.remainder(60)}秒';
+        _countdownTextFromHokuso = times[6].isNegative
+            ? '🔚'
+            : '${times[6].inMinutes.remainder(60)}分${times[6].inSeconds.remainder(60)}秒';
+        _countdownTextFromShinKashiwa = times[7].isNegative
+            ? '🔚'
+            : '${times[7].inMinutes.remainder(60)}分${times[7].inSeconds.remainder(60)}秒';
+        _countdownTextFromAbiko = times[8].isNegative
+            ? '🔚'
+            : '${times[8].inMinutes.remainder(60)}分${times[8].inSeconds.remainder(60)}秒';
       });
     });
   }
@@ -199,6 +228,46 @@ class _BusCountdownState extends State<BusCountdown> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final List<Map<String, String>> fromSchoolBusses = [
+      {
+        'dest': busDetailFromSchool(getFirstBus(forKashiwa)),
+        'time': _countdownTextForKashiwa
+      },
+      {
+        'dest': busDetailFromSchool(getFirstBus(forShinkamagaya)),
+        'time': _countdownTextForShinkamagaya
+      },
+      {
+        'dest': busDetailFromSchool(getFirstBus(forHokuso)),
+        'time': _countdownTextForHokuso
+      }
+    ];
+    final List<Map<String, String>> toSchoolBusses = [
+      {
+        'dest': busDetailToSchool(getFirstBus(fromKashiwa)),
+        'time': _countdownTextFromKashiwa
+      },
+      {
+        'dest': busDetailToSchool(getFirstBus(fromShinkamagaya)),
+        'time': _countdownTextFromShinkamagaya
+      },
+      {
+        'dest': busDetailToSchool(getFirstBus(fromShiroi)),
+        'time': _countdownTextFromShiroi
+      },
+      {
+        'dest': busDetailToSchool(getFirstBus(fromHokuso)),
+        'time': _countdownTextFromHokuso
+      },
+      {
+        'dest': busDetailToSchool(getFirstBus(fromShinKashiwa)),
+        'time': _countdownTextFromShinKashiwa
+      },
+      {
+        'dest': busDetailToSchool(getFirstBus(fromAbiko)),
+        'time': _countdownTextFromAbiko
+      }
+    ];
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -219,94 +288,44 @@ class _BusCountdownState extends State<BusCountdown> {
             return TabBarView(
               // 校舎発・校舎行きでTabbar, 行き先・出発駅ごとにその中で縦並びにして表示
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 柏行き
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            busDetailFromSchool(getFirstBus(forKashiwa)),
-                            style: TextStyle(
-                                fontSize: screenWidth > 830 ? 25.sp : 45.sp),
-                          ),
-                          Text(
-                            _countdownTextForKashiwa,
-                            style: TextStyle(
-                                fontSize: screenWidth > 830 ? 50.sp : 90.sp,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ]),
-                    Divider(
-                        height: 30.w,
-                        thickness: 3,
-                        color: const Color.fromARGB(255, 150, 200, 233)),
-                    // 新鎌ケ谷行き
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            busDetailFromSchool(getFirstBus(forShinkamagaya)),
-                            style: TextStyle(
-                                fontSize: screenWidth > 830 ? 25.sp : 45.sp),
-                          ),
-                          Text(
-                            _countdownTextForShinkamagaya,
-                            style: TextStyle(
-                                fontSize: screenWidth > 830 ? 50.sp : 90.sp,
-                                fontWeight: FontWeight.w500),
-                          )
-                        ]),
-                    Divider(
-                        height: 30.w,
-                        thickness: 3,
-                        color: const Color.fromARGB(255, 168, 211, 233)),
-                    // 北総行き
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            busDetailFromSchool(getFirstBus(forHokuso)),
-                            style: TextStyle(
-                                fontSize: screenWidth > 830 ? 25.sp : 45.sp),
-                          ),
-                          Text(
-                            _countdownTextForHokuso,
-                            style: TextStyle(
-                                fontSize: screenWidth > 830 ? 50.sp : 90.sp,
-                                fontWeight: FontWeight.w500),
-                          )
-                        ]),
-                  ],
-                ),
-                // 校舎行き
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 柏発
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              busDetailToSchool(getFirstBus(fromKashiwa)),
+                // 校舎発
+                ListView.builder(
+                    itemBuilder: (context, index) => Card(
+                          child: ListTile(
+                            title: Text(
+                              fromSchoolBusses[index]['dest']!,
                               style: TextStyle(
                                   fontSize: screenWidth > 830 ? 25.sp : 45.sp),
                             ),
-                            Text(
-                              _countdownTextFromKashiwa,
+                            subtitle: Text(
+                              fromSchoolBusses[index]['time']!,
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: screenWidth > 830 ? 50.sp : 90.sp,
                                   fontWeight: FontWeight.w500),
-                            )
-                          ]),
-                    ])
+                            ),
+                          ),
+                        ),
+                    itemCount: fromSchoolBusses.length),
+                // 校舎行き
+                ListView.builder(
+                    itemBuilder: (context, index) => Card(
+                          child: ListTile(
+                            title: Text(
+                              toSchoolBusses[index]['dest']!,
+                              style: TextStyle(
+                                  fontSize: screenWidth > 830 ? 25.sp : 45.sp),
+                            ),
+                            subtitle: Text(
+                              toSchoolBusses[index]['time']!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: screenWidth > 830 ? 50.sp : 90.sp,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+                    itemCount: toSchoolBusses.length),
               ],
             );
           },
