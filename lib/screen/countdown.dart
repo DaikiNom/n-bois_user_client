@@ -189,31 +189,31 @@ class _BusCountdownState extends State<BusCountdown> {
         // 最終便の時刻を過ぎていたら何も表示しない
         _countdownTextForKashiwa = times[0] == const Duration()
             ? '🔚'
-            : '${times[0].inMinutes}分${times[0].inSeconds % 60}秒';
+            : '${times[0].inMinutes}分${(times[0].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextForShinkamagaya = times[1] == const Duration()
             ? '🔚'
-            : '${times[1].inMinutes}分${times[1].inSeconds % 60}秒';
+            : '${times[1].inMinutes}分${(times[1].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextForHokuso = times[2] == const Duration()
             ? '🔚'
-            : '${times[2].inMinutes}分${times[2].inSeconds % 60}秒';
+            : '${times[2].inMinutes}分${(times[2].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextFromKashiwa = times[3] == const Duration()
             ? '🔚'
-            : '${times[3].inMinutes}分${times[3].inSeconds % 60}秒';
+            : '${times[3].inMinutes}分${(times[3].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextFromShinkamagaya = times[4] == const Duration()
             ? '🔚'
-            : '${times[4].inMinutes}分${times[4].inSeconds % 60}秒';
+            : '${times[4].inMinutes}分${(times[4].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextFromShiroi = times[5] == const Duration()
             ? '🔚'
-            : '${times[5].inMinutes}分${times[5].inSeconds % 60}秒';
+            : '${times[5].inMinutes}分${(times[5].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextFromHokuso = times[6] == const Duration()
             ? '🔚'
-            : '${times[6].inMinutes}分${times[6].inSeconds % 60}秒';
+            : '${times[6].inMinutes}分${(times[6].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextFromShinKashiwa = times[7] == const Duration()
             ? '🔚'
-            : '${times[7].inMinutes}分${times[7].inSeconds % 60}秒';
+            : '${times[7].inMinutes}分${(times[7].inSeconds % 60).toString().padLeft(2, '0')}秒';
         _countdownTextFromAbiko = times[8] == const Duration()
             ? '🔚'
-            : '${times[8].inMinutes}分${times[8].inSeconds % 60}秒';
+            : '${times[8].inMinutes}分${(times[8].inSeconds % 60).toString().padLeft(2, '0')}秒';
       });
     });
   }
