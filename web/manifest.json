@@ -1,11 +1,11 @@
 {
-    "name": "nbois_user_client",
-    "short_name": "nbois_user_client",
+    "name": "N-BOIS",
+    "short_name": "N-BOIS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "N-BOIS is a app that allows you know current information about the bus of Nishogakusha Univ. Kashiwa High / Junior High School.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
