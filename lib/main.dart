@@ -75,6 +75,13 @@ class _BusAppState extends State<BusApp> {
     });
   }
 
+  // アプリ起動時のみ，Supabaseから時刻表データを取得する
+  @override
+  void initState() {
+    super.initState();
+    getTimetable();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

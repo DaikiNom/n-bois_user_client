@@ -2,101 +2,121 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'dart:async';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-/* 時刻表のList
-  id, station, departureTime(TimeOfDay)
-  id: [1 → 常時運行(校舎発), 2 → 常時運行(校舎行), 3 → 常時運行(平日のみ教職員優先), 4 → 平日のみ運行, 5 → 休日のみ運行, -1 → 本日の運行は終了しました]
-  departureTime: 出発時刻
-*/
-// NOTE: 時刻表は本番環境ではデータベース or API から取得するようにする
+List<BusSchedule> forKashiwa = [];
+List<BusSchedule> forShinkamagaya = [];
+List<BusSchedule> forHokuso = [];
+List<BusSchedule> fromKashiwa = [];
+List<BusSchedule> fromShinkamagaya = [];
+List<BusSchedule> fromShiroi = [];
+List<BusSchedule> fromHokuso = [];
+List<BusSchedule> fromShinKashiwa = [];
+List<BusSchedule> fromAbiko = [];
 
-List<BusSchedule> forKashiwa = [
-  BusSchedule(1, '柏', const TimeOfDay(hour: 11, minute: 10)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 11, minute: 50)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 12, minute: 10)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 12, minute: 50)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 13, minute: 30)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 13, minute: 50)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 14, minute: 20)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 15, minute: 10)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 15, minute: 40)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 10)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 40)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 16, minute: 55)),
-  BusSchedule(3, '柏', const TimeOfDay(hour: 17, minute: 10)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 30)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 17, minute: 45)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 00)),
-  BusSchedule(3, '柏', const TimeOfDay(hour: 18, minute: 20)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 18, minute: 45)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 00)),
-  BusSchedule(1, '柏', const TimeOfDay(hour: 19, minute: 20)),
-];
-
-List<BusSchedule> forShinkamagaya = [
-  BusSchedule(5, '新鎌ケ谷方面', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(4, '新鎌ケ谷方面', const TimeOfDay(hour: 16, minute: 00)),
-  BusSchedule(1, '新鎌ケ谷方面', const TimeOfDay(hour: 18, minute: 30)),
-];
-
-List<BusSchedule> forHokuso = [
-  BusSchedule(5, '北総方面', const TimeOfDay(hour: 13, minute: 15)),
-  BusSchedule(4, '北総方面', const TimeOfDay(hour: 16, minute: 00)),
-  BusSchedule(1, '北総方面', const TimeOfDay(hour: 18, minute: 30)),
-];
-
-List<BusSchedule> fromKashiwa = [
-  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 10)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 15)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 20)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 25)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 35)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 7, minute: 40)),
-  BusSchedule(2, '柏(二松駐車場)', const TimeOfDay(hour: 7, minute: 45)),
-  BusSchedule(2, '柏(二松駐車場)', const TimeOfDay(hour: 8, minute: 05)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 8, minute: 27)),
-  BusSchedule(2, '柏(二松駐車場)', const TimeOfDay(hour: 8, minute: 50)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 9, minute: 00)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 9, minute: 30)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 10, minute: 00)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 10, minute: 30)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 11, minute: 05)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 11, minute: 20)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 12, minute: 05)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 12, minute: 25)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 13, minute: 05)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 13, minute: 45)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 14, minute: 05)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 14, minute: 35)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 15, minute: 25)),
-  BusSchedule(2, '柏', const TimeOfDay(hour: 15, minute: 55)),
-];
-
-List<BusSchedule> fromShinkamagaya = [
-  BusSchedule(2, '新鎌ケ谷', const TimeOfDay(hour: 7, minute: 10)),
-];
-
-List<BusSchedule> fromShiroi = [
-  BusSchedule(2, '白井', const TimeOfDay(hour: 7, minute: 15)),
-  BusSchedule(2, '西白井', const TimeOfDay(hour: 7, minute: 25)),
-];
-
-List<BusSchedule> fromHokuso = [
-  BusSchedule(2, '印旛日本医大', const TimeOfDay(hour: 7, minute: 10)),
-  BusSchedule(2, '千葉ニュータウン', const TimeOfDay(hour: 7, minute: 15)),
-  BusSchedule(2, '印西牧の原', const TimeOfDay(hour: 7, minute: 20)),
-  BusSchedule(2, '小室', const TimeOfDay(hour: 7, minute: 30)),
-];
-
-List<BusSchedule> fromShinKashiwa = [
-  BusSchedule(2, '新柏', const TimeOfDay(hour: 7, minute: 20)),
-  BusSchedule(2, '新柏', const TimeOfDay(hour: 8, minute: 10)),
-];
-
-List<BusSchedule> fromAbiko = [
-  BusSchedule(2, '我孫子', const TimeOfDay(hour: 7, minute: 20)),
-  BusSchedule(2, '我孫子', const TimeOfDay(hour: 8, minute: 12)),
-];
+// supabaseから時刻表を取得
+getTimetable() async {
+  final client = Supabase.instance.client;
+  final response = await client
+      .from('bus_schedules')
+      .select('direction, station, departure_time, status')
+      .execute();
+  // 行き先，directionによってそれぞれの配列に格納
+  for (var i = 0; i < response.data!.length; i++) {
+    if (response.data![i]['direction'] == 'for') {
+      if (response.data![i]['station'] == '柏' ||
+          response.data![i]['station'] == '柏(二松駐車場)') {
+        forKashiwa.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '新鎌ケ谷方面') {
+        forShinkamagaya.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '北総方面') {
+        forHokuso.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      }
+    } else if (response.data![i]['direction'] == 'from') {
+      if (response.data![i]['station'] == '柏' ||
+          response.data![i]['station'] == '柏(二松駐車場)') {
+        fromKashiwa.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '新鎌ケ谷') {
+        fromShinkamagaya.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '白井' ||
+          response.data![i]['station'] == '西白井') {
+        fromShiroi.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '印旛日本医大' ||
+          response.data![i]['station'] == '千葉ニュータウン' ||
+          response.data![i]['station'] == '印西牧の原' ||
+          response.data![i]['station'] == '小室') {
+        fromHokuso.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '新柏') {
+        fromShinKashiwa.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      } else if (response.data![i]['station'] == '我孫子') {
+        fromAbiko.add(BusSchedule(
+            response.data![i]['status'],
+            response.data![i]['station'],
+            TimeOfDay(
+                hour: int.parse(
+                    response.data![i]['departure_time'].split(':')[0]),
+                minute: int.parse(
+                    response.data![i]['departure_time'].split(':')[1]))));
+      }
+    }
+  }
+}
 
 class BusCountdown extends StatefulWidget {
   const BusCountdown({Key? key}) : super(key: key);
