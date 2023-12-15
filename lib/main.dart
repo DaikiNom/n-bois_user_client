@@ -6,13 +6,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:nbois_user_client/env/env.dart';
 import 'package:nbois_user_client/screen/countdown.dart';
 import 'package:nbois_user_client/screen/map.dart';
 import 'package:nbois_user_client/screen/notification.dart';
 
-void main() {
-  // 縦向き固定
+Future<void> main() async {
+  // supabaseの初期化
   WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(url: Env.SupabaseUrl, anonKey: Env.SupabaseAnonKey);
+  // 縦向き固定
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());

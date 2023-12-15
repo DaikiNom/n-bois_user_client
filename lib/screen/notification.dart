@@ -1,91 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-// NOTE: 本番では，情報はREST APIから取得する
-// 通知の内容は[title, body, date, sender]の形式
-List<busNotification> allNotifications = [
-  busNotification(
-    'サンプル通知1',
-    'サンプル通知1の内容',
-    DateTime(2023, 1, 1),
-    'サンプル送信者1',
-  ),
-  busNotification(
-    'サンプル通知2',
-    'サンプル通知2の内容',
-    DateTime(2023, 2, 1),
-    'サンプル送信者2',
-  ),
-  busNotification(
-    'サンプル通知3',
-    'サンプル通知3の内容',
-    DateTime(2023, 3, 1),
-    'サンプル送信者3',
-  ),
-  busNotification(
-    'サンプル通知4',
-    'サンプル通知4の内容',
-    DateTime(2023, 4, 1),
-    'サンプル送信者4',
-  ),
-  busNotification(
-    'サンプル通知5',
-    'サンプル通知5の内容',
-    DateTime(2023, 5, 1),
-    'サンプル送信者5',
-  ),
-  busNotification(
-    'サンプル通知6',
-    'サンプル通知6の内容',
-    DateTime(2023, 6, 1),
-    'サンプル送信者6',
-  ),
-  busNotification(
-    'サンプル通知7',
-    'サンプル通知7の内容',
-    DateTime(2023, 7, 1),
-    'サンプル送信者7',
-  ),
-  busNotification(
-    'サンプル通知8',
-    'サンプル通知8の内容',
-    DateTime(2023, 8, 1),
-    'サンプル送信者8',
-  ),
-  busNotification(
-    'サンプル通知9',
-    'サンプル通知9の内容',
-    DateTime(2023, 9, 1),
-    'サンプル送信者9',
-  ),
-  busNotification(
-    'サンプル通知10',
-    'サンプル通知10の内容',
-    DateTime(2023, 10, 1),
-    'サンプル送信者10',
-  ),
-  busNotification(
-    'サンプル通知11',
-    'サンプル通知11の内容',
-    DateTime(2023, 11, 1),
-    'サンプル送信者11',
-  ),
-  busNotification(
-    'サンプル通知12',
-    'サンプル通知12の内容',
-    DateTime(2023, 12, 1),
-    'サンプル送信者12',
-  ),
-];
-
-// 通知形式の定義
+// 通知の内容を格納するクラス
 class busNotification {
   final String title;
   final String body;
   final DateTime date;
-  final String sender;
+  final String created_by;
 
-  busNotification(this.title, this.body, this.date, this.sender);
+  busNotification(this.title, this.body, this.date, this.created_by);
 }
 
 class NotificationScreen extends StatefulWidget {
@@ -97,12 +21,44 @@ class NotificationScreen extends StatefulWidget {
 
 // 通知画面
 class _NotificationScreenState extends State<NotificationScreen> {
-  DateFormat format = DateFormat('yyyy/MM/dd');
+  List<busNotification> allNotifications = [];
+  final client = Supabase.instance.client;
+  getNotifications() async {
+    final response =
+        await client.from('notifications').select<List>().execute();
+    for (var i = 0; i < response.data!.length; i++) {
+      allNotifications.add(busNotification(
+          response.data![i]['title'],
+          response.data![i]['body'],
+          DateTime.parse(response.data![i]['created_at']),
+          response.data![i]['created_by']));
+    }
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getNotifications();
+  }
+
+  final DateFormat format = DateFormat('yyyy/MM/dd');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('通知一覧'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              allNotifications = [];
+              getNotifications();
+              setState(() {});
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: allNotifications.length,
@@ -153,7 +109,7 @@ class NotificationDetailScreen extends StatelessWidget {
           ),
           ListTile(
             title: const Text('送信者'),
-            subtitle: Text(notification.sender),
+            subtitle: Text(notification.created_by),
           ),
           ListTile(
             title: const Text('送信日時'),
