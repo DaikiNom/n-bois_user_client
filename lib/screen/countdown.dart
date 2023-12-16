@@ -128,7 +128,7 @@ class BusCountdown extends StatefulWidget {
 class _BusCountdownState extends State<BusCountdown> {
   String busDetailFromSchool(BusSchedule busSchedule) {
     if (busSchedule.id == -1) {
-      return '本日の運行は終了しました';
+      return '本日の ${busSchedule.station}行き の運行は終了しました';
     } else if (busSchedule.id == 2) {
       return '次の ${busSchedule.station}(教職員優先) のバスまで';
     } else {
@@ -138,7 +138,7 @@ class _BusCountdownState extends State<BusCountdown> {
 
   String busDetailToSchool(BusSchedule busSchedule) {
     if (busSchedule.id == -1) {
-      return '本日の運行は終了しました';
+      return '本日の ${busSchedule.station}発 の運行は終了しました';
     } else {
       return '次の ${busSchedule.station}発 のバスまで';
     }
@@ -401,7 +401,9 @@ BusSchedule getFirstBus(List<BusSchedule> busSchedules) {
 
   // firstBusに何も格納されていない場合の処理
   if (firstBus == null) {
-    return BusSchedule(-1, '本日の運行は終了しました', const TimeOfDay(hour: 0, minute: 0));
+    // 明日の始発の行き先を取得
+    return BusSchedule(
+        -1, busSchedules[0].station, const TimeOfDay(hour: 0, minute: 0));
   } else {
     return firstBus;
   }
