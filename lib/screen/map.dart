@@ -64,8 +64,8 @@ class _BusMapState extends State<BusMap> {
             }
             return FlutterMap(
               options: const MapOptions(
-                initialCenter: LatLng(35.652832, 139.839478),
-                initialZoom: 10.0,
+                initialCenter: LatLng(35.851997, 140.011988),
+                initialZoom: 12.5,
               ),
               children: [
                 TileLayer(
