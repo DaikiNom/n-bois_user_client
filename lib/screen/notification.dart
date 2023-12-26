@@ -24,8 +24,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
   List<busNotification> allNotifications = [];
   final client = Supabase.instance.client;
   getNotifications() async {
-    final response =
-        await client.from('notifications').select<List>().execute();
+    // 通知を更新日の新しい順に取得
+    final response = await client
+        .from('notifications')
+        .select()
+        .order('created_at', ascending: false)
+        .execute();
     for (var i = 0; i < response.data!.length; i++) {
       allNotifications.add(busNotification(
           response.data![i]['title'],
