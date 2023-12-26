@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BusMap extends StatefulWidget {
@@ -55,7 +56,7 @@ class _BusMapState extends State<BusMap> {
                     height: 80.0,
                     point: LatLng(busLocation.latitude, busLocation.longitude),
                     child: const Icon(
-                      Icons.directions_bus,
+                      Icons.directions_bus_filled,
                       color: Colors.blue,
                     ),
                   ),
@@ -65,12 +66,14 @@ class _BusMapState extends State<BusMap> {
             return FlutterMap(
               options: const MapOptions(
                 initialCenter: LatLng(35.851997, 140.011988),
-                initialZoom: 12.5,
+                initialZoom: 14,
               ),
               children: [
+                // cancelable tile providerを使う
                 TileLayer(
                   urlTemplate:
-                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                  tileProvider: CancellableNetworkTileProvider(),
                 ),
                 MarkerLayer(
                   markers: _markers,
