@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:nbois_user_client/screen/settings.dart';
 
 // 通知の内容を格納するクラス
 class busNotification {
@@ -52,6 +53,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          // 設定画面へ遷移
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Settings()));
+          },
+          icon: const Icon(Icons.settings),
+        ),
         title: const Text('通知一覧'),
         actions: [
           IconButton(

@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'dart:async';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:nbois_user_client/screen/settings.dart';
 
 List<BusSchedule> forKashiwa = [];
 List<BusSchedule> forShinkamagaya = [];
@@ -292,6 +293,14 @@ class _BusCountdownState extends State<BusCountdown> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            // 設定画面へ遷移
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Settings()));
+            },
+            icon: const Icon(Icons.settings),
+          ),
           title: const Text('バス時刻表'),
           bottom: const TabBar(
             tabs: [

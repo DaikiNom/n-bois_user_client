@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:nbois_user_client/screen/settings.dart';
 
 class BusMap extends StatefulWidget {
   const BusMap({Key? key}) : super(key: key);
@@ -36,6 +37,14 @@ class _BusMapState extends State<BusMap> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          // 設定画面へ遷移
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Settings()));
+          },
+          icon: const Icon(Icons.settings),
+        ),
         title: const Text('N-BOIS'),
       ),
       body: StreamBuilder<List<BusLocation>>(
