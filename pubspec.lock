@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.0"
+  animated_stack_widget:
+    dependency: transitive
+    description:
+      name: animated_stack_widget
+      sha256: ce4788dd158768c9d4388354b6fb72600b78e041a37afc4c279c63ecafcb9408
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   app_links:
     dependency: transitive
     description:
@@ -286,6 +294,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  flutter_map_marker_popup:
+    dependency: "direct main"
+    description:
+      name: flutter_map_marker_popup
+      sha256: ec563bcbae24a18ac16815fb75ac5ab33ccba609e14db70e252a67de19c6639c
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.2"
   flutter_screenutil:
     dependency: "direct main"
     description:
@@ -520,6 +536,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   package_config:
     dependency: transitive
     description:
@@ -656,6 +680,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  provider:
+    dependency: transitive
+    description:
+      name: provider
+      sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.1"
   pub_semver:
     dependency: transitive
     description:
@@ -918,13 +950,13 @@ packages:
     source: hosted
     version: "0.3.1"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
-      sha256: e9aa5ea75c84cf46b3db4eea212523591211c3cf2e13099ee4ec147f54201c86
+      sha256: d25bb0ca00432a5e1ee40e69c36c85863addf7cc45e433769d61bed3fe81fd96
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.2"
+    version: "6.2.3"
   url_launcher_android:
     dependency: transitive
     description:

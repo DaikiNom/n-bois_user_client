@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:nbois_user_client/screen/settings.dart';
 
 class BusMap extends StatefulWidget {
@@ -61,12 +62,13 @@ class _BusMapState extends State<BusMap> {
                   busLocation.longitude >= -180) {
                 _markers.add(
                   Marker(
+                    key: ValueKey<String>(busLocation.id),
                     width: 80.0,
                     height: 80.0,
                     point: LatLng(busLocation.latitude, busLocation.longitude),
                     child: const Icon(
                       Icons.directions_bus_filled,
-                      color: Colors.blue,
+                      color: Colors.green,
                     ),
                   ),
                 );
@@ -81,12 +83,22 @@ class _BusMapState extends State<BusMap> {
                 // cancelable tile providerを使う
                 TileLayer(
                   urlTemplate:
-                      'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                      'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
                   tileProvider: CancellableNetworkTileProvider(),
                 ),
-                MarkerLayer(
-                  markers: _markers,
-                ),
+                MarkerLayer(markers: _markers),
+                // クレジット
+                RichAttributionWidget(
+                  animationConfig: const FadeRAWA(),
+                  attributions: [
+                    TextSourceAttribution('地理院タイル',
+                        onTap: () => launchUrl(Uri.parse(
+                            'https://maps.gsi.go.jp/development/ichiran.html'))),
+                    const TextSourceAttribution(
+                        'Shoreline data is derived from:\r\n United States.National Imagery and Mapping Agency.\r\n"Vector Map Level 0 (VMAP0)." Bethesda, MD: Denver, CO: The Agency;\r\n USGS Information Services, 1997.',
+                        prependCopyright: false),
+                  ],
+                )
               ],
             );
           } else {
@@ -108,4 +120,22 @@ class BusLocation {
     required this.id,
   })  : latitude = map['latitude'],
         longitude = map['longitude'];
+}
+
+class BusDetail {
+  final String id;
+  final String destination;
+  final List? via;
+  final TimeOfDay departureTime;
+
+  BusDetail.fromMap({
+    required Map<String, dynamic> map,
+    required this.id,
+  })  : destination = map['destination'],
+        via = map['via'],
+        // departureTimeはString型で保存されているのでTimeOfDay型に変換
+        departureTime = TimeOfDay(
+          hour: int.parse(map['departureTime'].toString().substring(0, 2)),
+          minute: int.parse(map['departureTime'].toString().substring(3, 5)),
+        );
 }

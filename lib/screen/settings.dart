@@ -3,9 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
-
-  static const routeName = '/settings';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,13 +15,15 @@ class Settings extends StatelessWidget {
           ListTile(
             title: const Text('利用規約'),
             onTap: () {
-              Navigator.of(context).pushNamed('/terms');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Terms()));
             },
           ),
           ListTile(
             title: const Text('プライバシーポリシー'),
             onTap: () {
-              Navigator.of(context).pushNamed('/privacy');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Privacy()));
             },
           ),
           ListTile(
@@ -36,14 +35,15 @@ class Settings extends StatelessWidget {
               applicationLegalese: 'Copyrights © 2023 N-BOIS Developer Team',
             ),
           ),
-          ListTile(
-            title: const Text('謝辞'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const Acknowledgements()));
+          const Text(
+            'このアプリは，二松学舎大学附属柏高等学校の許諾・協力のもと開発・運営されているものです．',
+            textAlign: TextAlign.center,
+          ),
+          TextButton(
+            onPressed: () {
+              launchUrl(Uri.parse('https://www.nishogakusha-kashiwa.ed.jp/'));
             },
+            child: const Text('二松学舎大学附属柏高等学校'),
           ),
         ],
       ),
@@ -81,50 +81,6 @@ class Privacy extends StatelessWidget {
       body: const Center(
         child: Text('プライバシーポリシー'),
       ),
-    );
-  }
-}
-
-// 謝辞
-class Acknowledgements extends StatelessWidget {
-  const Acknowledgements({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('謝辞'),
-      ),
-      body: Center(
-          child: Column(
-        children: [
-          // 地理院タイル
-          Column(children: [
-            const Text('アプリ内の地図は国土地理院の地理院タイルを使用しています．'),
-            // linkを表示する
-            TextButton(
-              onPressed: () {
-                launchUrl(Uri.parse(
-                    'https://maps.gsi.go.jp/development/ichiran.html'));
-              },
-              child: const Text('地理院タイル'),
-            ),
-          ]),
-          // 二松柏
-          Column(
-            children: [
-              const Text('このアプリは，二松学舎大学附属柏高等学校の許諾・協力のもと開発・運営されているものです．'),
-              TextButton(
-                onPressed: () {
-                  launchUrl(
-                      Uri.parse('https://www.nishogakusha-kashiwa.ed.jp/'));
-                },
-                child: const Text('二松学舎大学附属柏高等学校'),
-              ),
-            ],
-          )
-        ],
-      )),
     );
   }
 }
