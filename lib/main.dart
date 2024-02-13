@@ -1,7 +1,5 @@
 /* Author: N-BOIS Developer Team*/
 // NOTE: このファイルで実装された機能は，将来的に他のファイルに移行する
-// IDEA: マテリアルデザインではなく，ニューモーフィズムを採用する
-// IDEA: ライセンス検討の上，ニューモーフィズム用のパッケージを導入する
 // IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
