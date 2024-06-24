@@ -29,14 +29,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final response = await client
         .from('notifications')
         .select()
-        .order('created_at', ascending: false)
-        .execute();
-    for (var i = 0; i < response.data!.length; i++) {
+        .order('created_at', ascending: false);
+    for (var i = 0; i < response.length; i++) {
       allNotifications.add(busNotification(
-          response.data![i]['title'],
-          response.data![i]['body'],
-          DateTime.parse(response.data![i]['created_at']),
-          response.data![i]['created_by']));
+          response[i]['title'],
+          response[i]['body'],
+          DateTime.parse(response[i]['created_at']),
+          response[i]['created_by']));
     }
 
     setState(() {});

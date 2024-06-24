@@ -55,6 +55,18 @@ class _BusMapState extends State<BusMap> {
             return const Center(child: Text('エラーが発生しました'));
           } else if (snapshot.hasData) {
             _markers.clear();
+            _markers.add(
+              const Marker(
+                key: ValueKey<String>('School'),
+                width: 100,
+                height: 100,
+                point: LatLng(35.851927, 140.011962),
+                child: Icon(
+                  Icons.school,
+                  color: Colors.black,
+                ),
+              ),
+            );
             for (final busLocation in snapshot.data!) {
               if (busLocation.latitude <= 90 &&
                   busLocation.latitude >= -90 &&

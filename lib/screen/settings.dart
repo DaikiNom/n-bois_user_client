@@ -31,12 +31,13 @@ class Settings extends StatelessWidget {
             onTap: () => showLicensePage(
               context: context,
               applicationName: 'N-BOIS',
-              applicationVersion: '0.1.1',
-              applicationLegalese: 'Copyrights © 2023 N-BOIS Developer Team',
+              applicationVersion: '0.2.0',
+              applicationLegalese:
+                  'Copyrights © 2023 - ${DateTime.now().year} N-BOIS Developer Team',
             ),
           ),
           const Text(
-            'このアプリは，二松学舎大学附属柏高等学校の許諾・協力のもと開発・運営されているものです．',
+            'このアプリは，二松学舎大学附属柏高等学校の許諾・協力のもと\r\n開発・運営されているものです．',
             textAlign: TextAlign.center,
           ),
           TextButton(

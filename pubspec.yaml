@@ -12,21 +12,21 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-  flutter_map: ^6.1.0
-  flutter_map_cancellable_tile_provider: ^2.0.0
-  flutter_map_marker_popup: ^6.1.2
+  flutter_map: ^7.0.1
+  flutter_map_cancellable_tile_provider: ^3.0.0
+  flutter_map_marker_popup: ^7.0.0
   flutter_screenutil: ^5.9.0
   google_fonts: ^6.1.0
   intl: ^0.19.0
   latlong2: ^0.9.0
   package_info: ^2.0.2
-  supabase_flutter: ^1.10.25
+  supabase_flutter: ^2.5.4
   url_launcher: ^6.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
   build_runner: ^2.4.8
   envied_generator: ^0.5.3
 

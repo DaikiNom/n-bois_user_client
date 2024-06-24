@@ -1,5 +1,4 @@
 /* Author: N-BOIS Developer Team*/
-// NOTE: このファイルで実装された機能は，将来的に他のファイルに移行する
 // IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         useMaterial3: true,
-        textTheme: GoogleFonts.kleeOneTextTheme(
+        textTheme: GoogleFonts.notoSansJavaneseTextTheme(
           Theme.of(context).textTheme,
         ),
         primaryColor: Colors.blueGrey,
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
-        textTheme: GoogleFonts.kleeOneTextTheme(
+        textTheme: GoogleFonts.notoSansJavaneseTextTheme(
           Theme.of(context).textTheme.apply(bodyColor: Colors.white),
         ),
         primaryColor: Colors.blueGrey,
