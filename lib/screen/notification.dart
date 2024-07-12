@@ -156,36 +156,37 @@ class NotificationDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('通知詳細'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              notification.title,
-              style: const TextStyle(fontSize: 20),
-            ),
+        appBar: AppBar(
+          title: const Text('通知詳細'),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  notification.title,
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(notification.body).urlToLink(context),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  DateFormat('yyyy/MM/dd').format(notification.date),
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+              if (notification.imageUrl != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.network(notification.imageUrl!),
+                ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(notification.body).urlToLink(context),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              DateFormat('yyyy/MM/dd').format(notification.date),
-              style: const TextStyle(fontSize: 12),
-            ),
-          ),
-          if (notification.imageUrl != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.network(notification.imageUrl!),
-            ),
-        ],
-      ),
-    );
+        ));
   }
 }
