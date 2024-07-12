@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:nbois_user_client/screen/settings.dart';
 
@@ -8,9 +10,53 @@ class busNotification {
   final String title;
   final String body;
   final DateTime date;
-  final String created_by;
+  final String? imageUrl;
 
-  busNotification(this.title, this.body, this.date, this.created_by);
+  busNotification(this.title, this.body, this.date, this.imageUrl);
+}
+
+// urlを検出してリンクに変換
+extension TextEx on Text {
+  RichText urlToLink(
+    BuildContext context,
+  ) {
+    final textSpans = <InlineSpan>[];
+
+    data!.splitMapJoin(
+      RegExp(
+        r'https?://([\w-]+\.)+[\w-]+(/[\w-./?%&=#]*)?',
+      ),
+      onMatch: (Match match) {
+        final _match = match[0] ?? '';
+        textSpans.add(
+          TextSpan(
+            text: _match,
+            style: const TextStyle(
+              color: Colors.blue,
+              decoration: TextDecoration.underline,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () async => await launchUrl(
+                    Uri.parse(_match),
+                  ),
+          ),
+        );
+        return '';
+      },
+      onNonMatch: (String text) {
+        textSpans.add(
+          TextSpan(
+              text: text,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium!.color,
+              )),
+        );
+        return '';
+      },
+    );
+
+    return RichText(text: TextSpan(children: textSpans));
+  }
 }
 
 class NotificationScreen extends StatefulWidget {
@@ -35,7 +81,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           response[i]['title'],
           response[i]['body'],
           DateTime.parse(response[i]['created_at']),
-          response[i]['created_by']));
+          response[i]['image_url']));
     }
 
     setState(() {});
@@ -115,18 +161,29 @@ class NotificationDetailScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ListTile(
-            title: Text(notification.title),
-            subtitle: Text(notification.body),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              notification.title,
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
-          ListTile(
-            title: const Text('送信者'),
-            subtitle: Text(notification.created_by),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(notification.body).urlToLink(context),
           ),
-          ListTile(
-            title: const Text('送信日時'),
-            subtitle: Text(DateFormat('yyyy/MM/dd').format(notification.date)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              DateFormat('yyyy/MM/dd').format(notification.date),
+              style: const TextStyle(fontSize: 12),
+            ),
           ),
+          if (notification.imageUrl != null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.network(notification.imageUrl!),
+            ),
         ],
       ),
     );

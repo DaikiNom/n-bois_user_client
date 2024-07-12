@@ -88,11 +88,14 @@ class _BusMapState extends State<BusMap> {
             }
             return FlutterMap(
               options: const MapOptions(
-                initialCenter: LatLng(35.851997, 140.011988),
-                initialZoom: 14,
-              ),
+                  initialCenter: LatLng(35.851997, 140.011988),
+                  initialZoom: 14,
+                  maxZoom: 14.49,
+                  minZoom: 10,
+                  interactionOptions: InteractionOptions(
+                    flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                  )),
               children: [
-                // cancelable tile providerを使う
                 TileLayer(
                   urlTemplate:
                       'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
