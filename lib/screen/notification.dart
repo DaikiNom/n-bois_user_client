@@ -1,15 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:nbois_user_client/screen/settings.dart';
 
 // 通知の内容を格納するクラス
 class busNotification {
   final String title;
   final String body;
   final DateTime date;
-  final String created_by;
+  final String? imageUrl;
 
-  busNotification(this.title, this.body, this.date, this.created_by);
+  busNotification(this.title, this.body, this.date, this.imageUrl);
+}
+
+// urlを検出してリンクに変換
+extension TextEx on Text {
+  RichText urlToLink(
+    BuildContext context,
+  ) {
+    final textSpans = <InlineSpan>[];
+
+    data!.splitMapJoin(
+      RegExp(
+        r'https?://([\w-]+\.)+[\w-]+(/[\w-./?%&=#]*)?',
+      ),
+      onMatch: (Match match) {
+        final _match = match[0] ?? '';
+        textSpans.add(
+          TextSpan(
+            text: _match,
+            style: const TextStyle(
+              color: Colors.blue,
+              decoration: TextDecoration.underline,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () async => await launchUrl(
+                    Uri.parse(_match),
+                  ),
+          ),
+        );
+        return '';
+      },
+      onNonMatch: (String text) {
+        textSpans.add(
+          TextSpan(
+              text: text,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium!.color,
+              )),
+        );
+        return '';
+      },
+    );
+
+    return RichText(text: TextSpan(children: textSpans));
+  }
 }
 
 class NotificationScreen extends StatefulWidget {
@@ -24,14 +71,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
   List<busNotification> allNotifications = [];
   final client = Supabase.instance.client;
   getNotifications() async {
-    final response =
-        await client.from('notifications').select<List>().execute();
-    for (var i = 0; i < response.data!.length; i++) {
+    // 通知を更新日の新しい順に取得
+    final response = await client
+        .from('notifications')
+        .select()
+        .order('created_at', ascending: false);
+    for (var i = 0; i < response.length; i++) {
       allNotifications.add(busNotification(
-          response.data![i]['title'],
-          response.data![i]['body'],
-          DateTime.parse(response.data![i]['created_at']),
-          response.data![i]['created_by']));
+          response[i]['title'],
+          response[i]['body'],
+          DateTime.parse(response[i]['created_at']),
+          response[i]['image_url']));
     }
 
     setState(() {});
@@ -48,6 +98,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          // 設定画面へ遷移
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Settings()));
+          },
+          icon: const Icon(Icons.settings),
+        ),
         title: const Text('通知一覧'),
         actions: [
           IconButton(
@@ -98,25 +156,37 @@ class NotificationDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('通知詳細'),
-      ),
-      body: Column(
-        children: [
-          ListTile(
-            title: Text(notification.title),
-            subtitle: Text(notification.body),
+        appBar: AppBar(
+          title: const Text('通知詳細'),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  notification.title,
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(notification.body).urlToLink(context),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  DateFormat('yyyy/MM/dd').format(notification.date),
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+              if (notification.imageUrl != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.network(notification.imageUrl!),
+                ),
+            ],
           ),
-          ListTile(
-            title: const Text('送信者'),
-            subtitle: Text(notification.created_by),
-          ),
-          ListTile(
-            title: const Text('送信日時'),
-            subtitle: Text(DateFormat('yyyy/MM/dd').format(notification.date)),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

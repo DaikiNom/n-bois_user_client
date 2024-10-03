@@ -1,8 +1,6 @@
 /* Author: N-BOIS Developer Team*/
-// NOTE: このファイルで実装された機能は，将来的に他のファイルに移行する
-// IDEA: マテリアルデザインではなく，ニューモーフィズムを採用する
-// IDEA: ライセンス検討の上，ニューモーフィズム用のパッケージを導入する
-// IDEA: 検討の上，taskbarに常駐させる←OS固有なので無理かも
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,7 +30,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         useMaterial3: true,
-        textTheme: GoogleFonts.kleeOneTextTheme(
+        textTheme: GoogleFonts.notoSansJavaneseTextTheme(
           Theme.of(context).textTheme,
         ),
         primaryColor: Colors.blueGrey,
@@ -41,7 +39,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
-        textTheme: GoogleFonts.kleeOneTextTheme(
+        textTheme: GoogleFonts.notoSansJavaneseTextTheme(
           Theme.of(context).textTheme.apply(bodyColor: Colors.white),
         ),
         primaryColor: Colors.blueGrey,
@@ -68,6 +66,10 @@ class _BusAppState extends State<BusApp> {
     BusCountdown(),
     NotificationScreen(),
   ];
+  List<ConnectivityResult> connectionStatus = [ConnectivityResult.none];
+  late final StreamSubscription<List<ConnectivityResult>>
+      connectivitySubscription;
+  final Connectivity _connectivity = Connectivity();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -75,27 +77,69 @@ class _BusAppState extends State<BusApp> {
     });
   }
 
-  // アプリ起動時のみ，Supabaseから時刻表データを取得する
+  // ネットワーク接続状況の監視
   @override
   void initState() {
     super.initState();
-    getTimetable();
+    initConnectivity();
+
+    connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    late List<ConnectivityResult> result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException {
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
+    setState(() {
+      connectionStatus = result;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: _screens[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.map), label: '地図'),
-            BottomNavigationBarItem(icon: Icon(Icons.lock_clock), label: '時刻表'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.notifications), label: 'お知らせ'),
-          ],
-          type: BottomNavigationBarType.fixed,
-        ));
+    if (connectionStatus.contains(ConnectivityResult.none)) {
+      return const Scaffold(
+        body: Center(
+          child: Text('インターネット接続がありません'),
+        ),
+      );
+    } else {
+      // 時刻表の取得
+      getTimetable();
+
+      return Scaffold(
+          body: _screens[_selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(icon: Icon(Icons.map), label: '地図'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.lock_clock), label: '時刻表'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.notifications), label: 'お知らせ'),
+            ],
+            type: BottomNavigationBarType.fixed,
+          ));
+    }
   }
 }
