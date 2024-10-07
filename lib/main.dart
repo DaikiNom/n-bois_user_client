@@ -21,7 +21,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
 
 // bottom navigation bar
 class BusApp extends StatefulWidget {
-  const BusApp({Key? key}) : super(key: key);
+  const BusApp({super.key});
 
   @override
   _BusAppState createState() => _BusAppState();

@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:nbois_user_client/screen/settings.dart';
 
 class BusMap extends StatefulWidget {
-  const BusMap({Key? key}) : super(key: key);
+  const BusMap({super.key});
 
   @override
   _BusMapState createState() => _BusMapState();

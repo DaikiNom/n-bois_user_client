@@ -110,7 +110,7 @@ getTimetable() async {
 }
 
 class BusCountdown extends StatefulWidget {
-  const BusCountdown({Key? key}) : super(key: key);
+  const BusCountdown({super.key});
 
   @override
   _BusCountdownState createState() => _BusCountdownState();

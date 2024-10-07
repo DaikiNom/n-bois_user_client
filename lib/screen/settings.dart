@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatelessWidget {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,15 +15,13 @@ class Settings extends StatelessWidget {
           ListTile(
             title: const Text('利用規約'),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Terms()));
+              launchUrl(Uri.parse('https://docs.n-bois.com/terms/'));
             },
           ),
           ListTile(
             title: const Text('プライバシーポリシー'),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Privacy()));
+              launchUrl(Uri.parse('https://docs.n-bois.com/privacypolicy/'));
             },
           ),
           ListTile(
@@ -36,6 +34,13 @@ class Settings extends StatelessWidget {
                   'Copyrights © 2023 - ${DateTime.now().year} N-BOIS Developer Team',
             ),
           ),
+          ListTile(
+            title: const Text('GitHub: DaikiNom/n-bois_user_client'),
+            onTap: () {
+              launchUrl(
+                  Uri.parse('https://github.com/DaikiNom/n-bois_user_client'));
+            },
+          ),
           const Text(
             'このアプリは，二松学舎大学附属柏高等学校の許諾・協力のもと\r\n開発・運営されているものです．',
             textAlign: TextAlign.center,
@@ -47,40 +52,6 @@ class Settings extends StatelessWidget {
             child: const Text('二松学舎大学附属柏高等学校'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// 利用規約
-class Terms extends StatelessWidget {
-  const Terms({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('利用規約'),
-      ),
-      body: const Center(
-        child: Text('利用規約'),
-      ),
-    );
-  }
-}
-
-// プライバシーポリシー
-class Privacy extends StatelessWidget {
-  const Privacy({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('プライバシーポリシー'),
-      ),
-      body: const Center(
-        child: Text('プライバシーポリシー'),
       ),
     );
   }
