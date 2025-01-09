@@ -29,7 +29,7 @@ class Settings extends StatelessWidget {
             onTap: () => showLicensePage(
               context: context,
               applicationName: 'N-BOIS',
-              applicationVersion: '0.2.0',
+              applicationVersion: '1.0.0',
               applicationLegalese:
                   'Copyrights © 2023 - ${DateTime.now().year} N-BOIS Developer Team',
             ),
